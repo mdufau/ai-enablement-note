@@ -7,8 +7,8 @@ dans les programmes de Sales Enablement.
 
 | Ressource | Description | Lien |
 |---|---|---|
-| 🗝 Escape Game | Traversez 4 salles, prenez des décisions stratégiques sur l'IA | [Jouer](https://mdufau.github.io/ai-enablement-note/escape-game.html) |
-| 📊 Note prospective | 3 leviers IA actionnables, sourcés sur la recherche 2025 | [Lire](https://mdufau.github.io/ai-enablement-note/note.html) |
+| 🗝 Escape Game | Traversez 4 salles, prenez des décisions stratégiques sur l'IA | [Jouer](https://mdufau.github.io/ai-enablement-note) |
+| 📊 Note prospective | 3 leviers IA actionnables, sourcés sur la recherche 2025 | [Lire](https://mdufau.github.io/ai-enablement-note) |
 
 ## 📁 Fichiers
 
