@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The AI Sales Dungeon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --orange: #E8572A;
+        --ink: #1C1B18;
+        --sand: #F7F5F0;
+        --white: #FFFFFF;
+        --gray-mid: #6B6760;
+        --gray-light: #C8C5BE;
+        --blue: #2A7BE8;
+        --green: #27A86B;
+        --yellow: #F5C842;
+        --violet: #7B5CF5;
+        --dungeon-bg: #0e0c0a;
+        --dungeon-stone: #1a1713;
+        --dungeon-wall: #252018;
+        --dungeon-border: #3a342c;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--dungeon-bg);
+        font-family: 'Nunito', sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+        color: var(--sand);
+    }/* Stone texture */
+    body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+        radial-gradient(ellipse 90% 50% at 50% 0%, rgba(232, 87, 42, 0.08) 0%, transparent 55%), radial-gradient(ellipse 40% 40% at 0% 40%, rgba(232, 87, 42, 0.06) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 100% 40%, rgba(232, 87, 42, 0.05) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+        animation: ambiance 5s ease-in-out infinite alternate;
+    }
+
+    @keyframes ambiance {
+        0% {
+            opacity:.7
+        }
+
+        100% {
+            opacity: 1
+        }
+    }/* Grid lines like stone blocks */
+    body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255, 255, 255, 0.012) 59px, rgba(255, 255, 255, 0.012) 60px), repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(255, 255, 255, 0.008) 79px, rgba(255, 255, 255, 0.008) 80px);
+        pointer-events: none;
+        z-index: 0;
+    }/* Torches */
+    .torch {
+        position: fixed;
+        z-index: 5;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .torch-left {
+        top: 20%;
+        left: 16px;
+    }
+
+    .torch-right {
+        top: 20%;
+        right: 16px;
+    }
+
+    .torch-glow {
+        position: absolute;
+        top: -16px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90px;
+        height: 90px;
+        background: radial-gradient(ellipse, rgba(232, 87, 42, 0.3) 0%, transparent 70%);
+        animation: tglow 1.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes tglow {
+        0% {
+            opacity: .5;
+            transform:translateX(-50%) scale(1)
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateX(-50%) scale(1.2)
+        }
+    }
+
+    .torch-flame {
+        width: 22px;
+        height: 32px;
+        background: radial-gradient(ellipse at 50% 80%, var(--orange) 0%, #ffaa33 45%, rgba(255, 200, 50, 0) 100%);
+        border-radius: 50% 50% 35% 35%;
+        margin-bottom: -4px;
+        filter: blur(1.5px);
+        animation: flicker 0.7s ease-in-out infinite alternate;
+    }
+
+    @keyframes flicker {
+        0% {
+            transform: scaleX(1) scaleY(1);
+            opacity: 1
+        }
+
+        30% {
+            transform: scaleX(1.1) scaleY(.93);
+            opacity: .9
+        }
+
+        70% {
+            transform: scaleX(.9) scaleY(1.06);
+            opacity: 1
+        }
+
+        100% {
+            transform: scaleX(1.04) scaleY(.97);
+            opacity: .95
+        }
+    }
+
+    .torch-stick {
+        width: 7px;
+        height: 44px;
+        background: linear-gradient(180deg, #7a5430, #3d2510);
+        border-radius: 2px;
+    }
+
+    .torch-bracket {
+        width: 20px;
+        height: 10px;
+        background: rgba(58, 52, 44, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 2px;
+    }/* Crack decorations */
+    .crack {
+        position: fixed;
+        background: rgba(58, 52, 44, 0.6);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .c1 {
+        top: 0;
+        left: 22%;
+        width: 1px;
+        height: 120px;
+        transform: rotate(3deg)
+    }
+
+    .c2 {
+        top: 0;
+        right: 17%;
+        width: 1px;
+        height: 180px;
+        transform: rotate(-2deg)
+    }
+
+    .c3 {
+        bottom: 0;
+        left: 38%;
+        width: 1px;
+        height: 90px
+    }
+
+    .c4 {
+        top: 38%;
+        left: 0;
+        width: 70px;
+        height: 1px;
+        transform: rotate(6deg)
+    }
+
+    .c5 {
+        top: 58%;
+        right: 0;
+        width: 55px;
+        height: 1px;
+        transform: rotate(-5deg)
+    }/* MAIN WRAP */
+    .dungeon-wrap {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 20px 52px;
+    }/* PROGRESS */
+    .progress-area {
+        width: 100%;
+        max-width: 720px;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+    .progress-area.show {
+        display: block;
+        animation: fadeIn .4s ease;
+    }
+
+    .progress-label {
+        font-family: 'Nunito', sans-serif;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--orange);
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 7px;
+    }
+
+    .progress-track {
+        height: 4px;
+        background: var(--dungeon-wall);
+        border-radius: 2px;
+        overflow: hidden;
+        border: 1px solid var(--dungeon-border);
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #a0350f, var(--orange), #ffaa44);
+        border-radius: 2px;
+        transition: width .7s cubic-bezier(.16, 1, .3, 1);
+        box-shadow: 0 0 12px rgba(232, 87, 42, .5);
+    }/* DOOR ROW */
+    .door-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .door-icon {
+        font-size: 20px;
+        filter: grayscale(1) brightness(.35);
+        transition: all .4s;
+    }
+
+    .door-icon.done {
+        filter: grayscale(0) brightness(1);
+    }
+
+    .door-icon.active {
+        filter: grayscale(0) brightness(1.2);
+        animation: dpulse 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes dpulse {
+        from {
+            transform:scale(1)
+        }
+
+        to {
+            transform: scale(1.18)
+        }
+    }
+
+    .door-dash {
+        color: var(--dungeon-border);
+        font-size: 11px;
+    }/* STONE PANEL */
+    .stone-panel {
+        width: 100%;
+        max-width: 720px;
+        background: var(--dungeon-stone);
+        border: 1px solid var(--dungeon-border);
+        border-radius: 6px;
+        padding: 42px 48px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 0 1px rgba(232, 87, 42, .06), 0 12px 60px rgba(0, 0, 0, .75), inset 0 1px 0 rgba(255, 255, 255, .04);
+    }
+
+    .stone-panel::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+        repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(255, 255, 255, .009) 31px, rgba(255, 255, 255, .009) 32px), repeating-linear-gradient(90deg, transparent, transparent 51px, rgba(255, 255, 255, .006) 51px, rgba(255, 255, 255, .006) 52px);
+        pointer-events: none;
+        border-radius: 6px;
+    }
+
+    .stone-panel::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, var(--orange) 50%, transparent 100%);
+        box-shadow: 0 0 14px rgba(232, 87, 42, .5);
+    }/* ROOM BADGE */
+    .room-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(232, 87, 42, .07);
+        border: 1px solid rgba(232, 87, 42, .22);
+        border-radius: 2rem;
+        padding: 5px 14px;
+        font-family: 'Nunito', sans-serif;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--orange);
+        margin-bottom: 22px;
+    }
+
+    .bdot {
+        width: 6px;
+        height: 6px;
+        background: var(--orange);
+        border-radius: 50%;
+        box-shadow: 0 0 7px var(--orange);
+        animation: bp 2s ease-in-out infinite;
+    }
+
+    @keyframes bp {
+        0%, 100% {
+            opacity:1
+        }
+
+        50% {
+            opacity: .35
+        }
+    }/* TYPO */
+    h1 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: clamp(32px, 5vw, 50px);
+        line-height: 1.08;
+        color: var(--sand);
+        margin-bottom: 18px;
+        letter-spacing: -.01em;
+    }
+
+    h1 em, h2 em {
+        font-style: italic;
+        color: var(--orange);
+        text-shadow: 0 0 22px rgba(232, 87, 42, .4);
+    }
+
+    h2 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: clamp(20px, 3vw, 28px);
+        line-height: 1.2;
+        color: var(--sand);
+        margin-bottom: 20px;
+    }
+
+    .lead {
+        font-size: 15px;
+        line-height: 1.8;
+        color: var(--gray-mid);
+        margin-bottom: 20px;
+    }/* SCENARIO */
+    .scenario-label {
+        font-family: 'Nunito', sans-serif;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--orange);
+        margin-bottom: 9px;
+    }
+
+    .scenario-box {
+        background: rgba(255, 255, 255, .025);
+        border: 1px solid var(--dungeon-border);
+        border-left: 3px solid var(--orange);
+        border-radius: 4px;
+        padding: 18px 20px;
+        margin-bottom: 22px;
+        font-size: 14px;
+        line-height: 1.8;
+        color: rgba(247, 245, 240, .7);
+    }
+
+    .scenario-box strong {
+        color: var(--sand);
+        font-weight: 800
+    }
+
+    .scenario-box em {
+        color: var(--orange);
+        font-style: italic
+    }/* MISSION */
+    .mission-tag {
+        font-family: 'Nunito', sans-serif;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--yellow);
+        margin-bottom: 8px
+    }
+
+    .mission-text {
+        font-family: 'Playfair Display', serif;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--sand);
+        margin-bottom: 22px;
+        line-height: 1.5
+    }/* CHOICES */
+    .choices {
+        display: flex;
+        flex-direction: column;
+        gap: 10px
+    }
+
+    .choice-btn {
+        background: rgba(255, 255, 255, .02);
+        border: 1px solid var(--dungeon-border);
+        border-radius: 4px;
+        padding: 15px 50px 15px 18px;
+        text-align: left;
+        cursor: pointer;
+        font-family: 'Nunito', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(247, 245, 240, .75);
+        transition: all .2s ease;
+        position: relative;
+        line-height: 1.55;
+    }
+
+    .choice-btn::before {
+        content: attr(data-key);
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .1em;
+        color: var(--dungeon-border);
+        font-family: 'Nunito', sans-serif;
+    }
+
+    .choice-btn:hover:not(.disabled):not(.correct):not(.wrong) {
+        border-color: var(--orange);
+        background: rgba(232, 87, 42, .07);
+        color: var(--sand);
+        transform: translateX(6px);
+        box-shadow: inset 3px 0 0 var(--orange), 0 4px 20px rgba(232, 87, 42, .1);
+    }
+
+    .choice-btn.correct {
+        border-color: var(--green);
+        background: rgba(39, 168, 107, .08);
+        color: var(--green);
+        pointer-events: none;
+        box-shadow: 0 0 18px rgba(39, 168, 107, .14), inset 3px 0 0 var(--green);
+    }
+
+    .choice-btn.wrong {
+        border-color: rgba(232, 87, 42, .3);
+        background: rgba(232, 87, 42, .04);
+        color: rgba(232, 87, 42, .45);
+        pointer-events: none;
+    }
+
+    .choice-btn.reveal-correct {
+        border-color: var(--green);
+        background: rgba(39, 168, 107, .05);
+        color: var(--green);
+        pointer-events: none;
+    }
+
+    .choice-btn.disabled {
+        pointer-events: none;
+        opacity: .38
+    }/* FEEDBACK */
+    .feedback {
+        display: none;
+        margin-top: 18px;
+        padding: 16px 20px;
+        border-radius: 4px;
+        font-size: 13px;
+        line-height: 1.75;
+        animation: fadeIn .3s ease
+    }
+
+    .feedback.show-ok {
+        display: block;
+        background: rgba(39, 168, 107, .05);
+        border: 1px solid rgba(39, 168, 107, .22);
+        color: rgba(247, 245, 240, .8)
+    }
+
+    .feedback.show-ko {
+        display: block;
+        background: rgba(232, 87, 42, .05);
+        border: 1px solid rgba(232, 87, 42, .18);
+        color: rgba(247, 245, 240, .75)
+    }
+
+    .fb-label {
+        font-family: 'Nunito', sans-serif;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        margin-bottom: 8px
+    }
+
+    .show-ok .fb-label {
+        color:var(--green)
+    }
+
+    .show-ko .fb-label {
+        color: var(--orange)
+    }
+
+    .feedback strong {
+        color: var(--sand)
+    }/* DOOR UNLOCK */
+    .door-unlock {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 22px;
+        animation: fadeIn .5s ease
+    }
+
+    .door-unlock.show {
+        display: flex
+    }
+
+    .door-graphic {
+        font-size: 56px;
+        animation: doorOpen .6s ease .2s both;
+        filter: drop-shadow(0 0 22px rgba(232, 87, 42, .65))
+    }
+
+    @keyframes doorOpen {
+        0% {
+            transform: scale(.4) rotateY(90deg);
+            opacity:0
+        }
+
+        60% {
+            transform: scale(1.12) rotateY(-5deg);
+            opacity:1
+        }
+
+        100% {
+            transform: scale(1) rotateY(0);
+            opacity: 1
+        }
+    }
+
+    .door-text {
+        font-family: 'Playfair Display', serif;
+        font-size: 15px;
+        font-weight: 700;
+        font-style: italic;
+        color: var(--orange);
+        margin-top: 10px;
+        text-align: center;
+        text-shadow: 0 0 22px rgba(232, 87, 42, .5)
+    }/* BUTTONS */
+    .next-btn {
+        display: none;
+        margin-top: 18px;
+        background: var(--orange);
+        color: var(--white);
+        border: none;
+        border-radius: 2rem;
+        padding: 14px 34px;
+        font-family: 'Nunito', sans-serif;
+        font-size: 14px;
+        font-weight: 900;
+        cursor: pointer;
+        letter-spacing: .04em;
+        transition: all .2s;
+        box-shadow: 0 4px 24px rgba(232, 87, 42, .35)
+    }
+
+    .next-btn.show {
+        display: inline-block;
+        animation: fadeIn .4s ease .4s both
+    }
+
+    .next-btn:hover {
+        background: #ff6b3d;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 36px rgba(232, 87, 42, .5)
+    }
+
+    .start-btn {
+        background: var(--orange);
+        color: var(--white);
+        border: none;
+        border-radius: 2rem;
+        padding: 16px 42px;
+        font-family: 'Nunito', sans-serif;
+        font-size: 15px;
+        font-weight: 900;
+        cursor: pointer;
+        letter-spacing: .04em;
+        transition: all .22s;
+        box-shadow: 0 4px 24px rgba(232, 87, 42, .35);
+        margin-top: 10px
+    }
+
+    .start-btn:hover {
+        background: #ff6b3d;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 40px rgba(232, 87, 42, .5)
+    }
+
+    .restart-btn {
+        background: transparent;
+        border: 1px solid var(--dungeon-border);
+        border-radius: 2rem;
+        padding: 12px 24px;
+        font-family: 'Nunito', sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--gray-mid);
+        cursor: pointer;
+        margin-left: 12px;
+        transition: all .2s;
+        letter-spacing: .04em
+    }
+
+    .restart-btn:hover {
+        border-color: var(--sand);
+        color: var(--sand)
+    }/* INTRO PILLS */
+    .intro-tags {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 28px
+    }
+
+    .pill {
+        font-family: 'Nunito', sans-serif;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 2rem
+    }
+
+    .pill-o {
+        background: rgba(232, 87, 42, .1);
+        color: var(--orange);
+        border: 1px solid rgba(232, 87, 42, .22)
+    }
+
+    .pill-v {
+        background: rgba(123, 92, 245, .1);
+        color: var(--violet);
+        border: 1px solid rgba(123, 92, 245, .22)
+    }
+
+    .pill-y {
+        background: rgba(245, 200, 66, .1);
+        color: var(--yellow);
+        border: 1px solid rgba(245, 200, 66, .22)
+    }/* RESULT */
+    .score-big {
+        font-family: 'Playfair Display', serif;
+        font-size: 86px;
+        font-weight: 700;
+        color: var(--sand);
+        text-shadow: 0 0 44px rgba(232, 87, 42, .4);
+        margin: 12px 0 4px;
+        line-height: 1
+    }
+
+    .score-big span {
+        color: var(--orange)
+    }
+
+    .score-sub {
+        font-size: 11px;
+        color: var(--gray-mid);
+        margin-bottom: 28px;
+        font-weight: 900;
+        letter-spacing: .1em;
+        text-transform: uppercase
+    }
+
+    .result-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 22px
+    }
+
+    .result-card {
+        background: rgba(255, 255, 255, .02);
+        border: 1px solid var(--dungeon-border);
+        border-radius: 4px;
+        padding: 18px;
+        text-align: center
+    }
+
+    .rc-val {
+        font-family: 'Playfair Display', serif;
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--orange);
+        text-shadow: 0 0 16px rgba(232, 87, 42, .4);
+        margin-bottom: 4px
+    }
+
+    .rc-label {
+        font-size: 10px;
+        color: var(--gray-mid);
+        font-weight: 900;
+        letter-spacing: .1em;
+        text-transform: uppercase
+    }
+
+    .insight-result {
+        background: rgba(232, 87, 42, .05);
+        border: 1px solid rgba(232, 87, 42, .16);
+        border-left: 3px solid var(--orange);
+        border-radius: 4px;
+        padding: 18px 20px;
+        margin-bottom: 24px;
+        font-size: 14px;
+        line-height: 1.75;
+        color: rgba(247, 245, 240, .8)
+    }
+
+    .insight-result strong {
+        color: var(--sand)
+    }/* SOURCES */
+    .source-block {
+        background: rgba(255, 255, 255, .02);
+        border: 1px solid var(--dungeon-border);
+        border-left: 3px solid var(--orange);
+        border-radius: 4px;
+        padding: 16px 20px;
+        margin-bottom: 14px;
+        font-size: 13px;
+        line-height: 1.8;
+        color: rgba(247, 245, 240, .72)
+    }
+
+    .source-block.bl {
+        border-left-color: var(--blue)
+    }
+
+    .source-block.gr {
+        border-left-color: var(--green)
+    }
+
+    .source-block.vi {
+        border-left-color: var(--violet)
+    }
+
+    .source-block strong {
+        color: var(--sand);
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px
+    }
+
+    .source-block em {
+        color: var(--orange);
+        font-style: normal;
+        font-weight: 900;
+        font-size: 12px
+    }/* DIVIDER */
+    .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--dungeon-border), transparent);
+        margin: 24px 0
+    }/* SIGNATURE */
+    .signature {
+        width: 100%;
+        max-width: 720px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 16px;
+        padding: 0 4px
+    }
+
+    .sig-name {
+        font-family: 'Nunito', sans-serif;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--gray-mid)
+    }
+
+    .sig-url {
+        font-family: 'Nunito', sans-serif;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: .06em;
+        color: var(--orange);
+        text-decoration: none;
+        opacity: .8
+    }
+
+    .sig-url:hover {
+        opacity: 1
+    }/* SCREENS */
+    .screen {
+        display: none
+    }
+
+    .screen.active {
+        display: block;
+        animation: fadeIn .45s ease
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform:translateY(14px)
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0)
+        }
+    }
+
+    @media (max-width: 600px) {
+        .stone-panel {
+            padding: 28px 20px
+        }
+
+        .result-grid {
+            grid-template-columns: 1fr
+        }
+
+        .score-big {
+            font-size: 60px
+        }
+
+        .torch {
+            display: none
+        }
+
+        .signature {
+            flex-direction: column;
+            gap: 6px;
+            align-items: flex-start
+        }
+    }
+    </style>
+</head>
+<body>
+
+    <div class="crack c1"></div>
+    <div class="crack c2"></div>
+    <div class="crack c3"></div>
+    <div class="crack c4"></div>
+    <div class="crack c5"></div>
+
+    <div class="torch torch-left">
+        <div class="torch-glow"></div>
+        <div class="torch-flame"></div>
+        <div class="torch-stick"></div>
+        <div class="torch-bracket"></div>
+    </div>
+    <div class="torch torch-right">
+        <div class="torch-glow"></div>
+        <div class="torch-flame"></div>
+        <div class="torch-stick"></div>
+        <div class="torch-bracket"></div>
+    </div>
+
+    <div class="dungeon-wrap">
+
+        <div class="progress-area" id="progressArea">
+            <div class="progress-label">
+                <span>🗝 Progression dans le donjon</span>
+                <span id="progressText">Salle 1 / 4</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill" style="width:0%"></div>
+            </div>
+        </div>
+
+        <!-- ══ INTRO ══ -->
+        <div class="screen active" id="screen-intro">
+            <div class="stone-panel">
+                <div class="room-badge">
+                    <div class="bdot"></div>
+                    Escape Game · Sales Enablement
+                </div>
+                <h1>
+                    The AI
+                    <br>
+                    <em>Sales</em>
+                     Dungeon
+                </h1>
+                <div class="intro-tags">
+                    <span class="pill pill-o">Sales Enablement</span>
+                    <span class="pill pill-v">Intelligence Artificielle</span>
+                    <span class="pill pill-y">4 salles · ~10 min</span>
+                </div>
+                <p class="lead">
+                    Vous venez d'être recruté(e) comme 
+                    <strong style="color:var(--sand)">Sales Enablement Manager</strong>
+                     dans une scale-up SaaS. Mais pour prendre votre poste, vous devez traverser le 
+                    <em style="color:var(--orange)">donjon de la décision</em>
+                     — 4 salles verrouillées, 4 épreuves stratégiques sur l'IA.
+                </p>
+                <p class="lead">
+                    Chaque 
+                    <strong style="color:var(--sand)">bonne décision déverrouille une porte</strong>
+                    . Une erreur vous prive d'un point mais ne vous bloque pas. Le directeur commercial vous attend de l'autre côté.
+                </p>
+                <button class="start-btn" onclick="startGame()">🗝 Entrer dans le donjon</button>
+            </div>
+            <div class="signature">
+                <span class="sig-name">Sales Enablement · AI Learning Lab</span>
+                <a class="sig-url" href="https://mdufau.github.io" target="_blank">mdufau.github.io</a>
+            </div>
+        </div>
+
+        <!-- ══ SALLE 1 ══ -->
+        <div class="screen" id="screen-1">
+            <div class="stone-panel">
+                <div class="room-badge">
+                    <div class="bdot"></div>
+                    🔐 Salle 1 — La Crypte des Contenus
+                </div>
+                <div class="door-row" id="doors-1"></div>
+                <div class="scenario-label">📜 Parchemin du gardien</div>
+                <div class="scenario-box">
+                    La directrice commerciale frappe à votre porte. 
+                    <strong>"Nos SDRs passent 3 heures par jour à chercher la bonne fiche produit ou à réécrire des emails depuis zéro. Ils closent moins. Ils s'épuisent."</strong>
+                     Elle vous demande 
+                    <em>quel levier IA activer en premier</em>
+                     pour libérer du temps de vente.
+                </div>
+                <div class="mission-tag">⚔ Votre épreuve</div>
+                <div class="mission-text">Quelle décision déverrouille la porte de la Crypte ?</div>
+                <div class="choices" id="choices-1">
+                    <button class="choice-btn" data-key="A" onclick="answer(1,this,false)">Déployer un LMS complet avec un parcours de formation sur 6 mois</button>
+                    <button class="choice-btn" data-key="B" onclick="answer(1,this,true)">Implémenter un générateur de contenus IA connecté au CRM — emails, fiches objections, battle cards produits</button>
+                    <button class="choice-btn" data-key="C" onclick="answer(1,this,false)">Recruter 2 content managers supplémentaires pour produire plus de ressources</button>
+                    <button class="choice-btn" data-key="D" onclick="answer(1,this,false)">Organiser un atelier de 2 jours pour harmoniser les pratiques commerciales</button>
+                </div>
+                <div class="feedback" id="feedback-1"></div>
+                <div class="door-unlock" id="unlock-1">
+                    <div class="door-graphic">🚪</div>
+                    <div class="door-text">
+                        La Crypte s'ouvre...
+                        <br>
+                        La Salle de l'Onboarding vous attend.
+                    </div>
+                </div>
+                <button class="next-btn" id="next-1" onclick="goTo(2)">Avancer dans le donjon →</button>
+            </div>
+            <div class="signature">
+                <span class="sig-name">Sales Enablement · AI Learning Lab</span>
+                <a class="sig-url" href="https://mdufau.github.io" target="_blank">mdufau.github.io</a>
+            </div>
+        </div>
+
+        <!-- ══ SALLE 2 ══ -->
+        <div class="screen" id="screen-2">
+            <div class="stone-panel">
+                <div class="room-badge">
+                    <div class="bdot"></div>
+                    🔐 Salle 2 — La Salle de l'Onboarding
+                </div>
+                <div class="door-row" id="doors-2"></div>
+                <div class="scenario-label">📜 Parchemin du gardien</div>
+                <div class="scenario-box">
+                    Huit nouvelles recrues arrivent le mois prochain. Le Head of Sales vous interpelle : 
+                    <strong>"Nos derniers onboardings ont pris 4 mois avant que les reps soient vraiment autonomes. On n'a pas ce luxe."</strong>
+                     Il vous donne 
+                    <em>carte blanche</em>
+                     pour repenser entièrement le programme.
+                </div>
+                <div class="mission-tag">⚔ Votre épreuve</div>
+                <div class="mission-text">Quelle approche IA réduit significativement le temps de ramp-up ?</div>
+                <div class="choices" id="choices-2">
+                    <button class="choice-btn" data-key="A" onclick="answer(2,this,false)">Doubler le nombre de sessions présentielles avec les managers</button>
+                    <button class="choice-btn" data-key="B" onclick="answer(2,this,false)">Créer un manuel d'onboarding PDF exhaustif, mis à jour chaque trimestre</button>
+                    <button class="choice-btn" data-key="C" onclick="answer(2,this,true)">Déployer des parcours adaptatifs par rôle + outil d'analyse de calls IA pour un coaching objectif en temps réel</button>
+                    <button class="choice-btn" data-key="D" onclick="answer(2,this,false)">Assigner un buddy senior à chaque nouvelle recrue pendant 3 mois</button>
+                </div>
+                <div class="feedback" id="feedback-2"></div>
+                <div class="door-unlock" id="unlock-2">
+                    <div class="door-graphic">🚪</div>
+                    <div class="door-text">
+                        La salle s'illumine...
+                        <br>
+                        La Bibliothèque Maudite vous appelle.
+                    </div>
+                </div>
+                <button class="next-btn" id="next-2" onclick="goTo(3)">Avancer dans le donjon →</button>
+            </div>
+            <div class="signature">
+                <span class="sig-name">Sales Enablement · AI Learning Lab</span>
+                <a class="sig-url" href="https://mdufau.github.io" target="_blank">mdufau.github.io</a>
+            </div>
+        </div>
+
+        <!-- ══ SALLE 3 ══ -->
+        <div class="screen" id="screen-3">
+            <div class="stone-panel">
+                <div class="room-badge">
+                    <div class="bdot"></div>
+                    🔐 Salle 3 — La Bibliothèque Maudite
+                </div>
+                <div class="door-row" id="doors-3"></div>
+                <div class="scenario-label">📜 Parchemin du gardien</div>
+                <div class="scenario-box">
+                    Vous pénétrez dans la bibliothèque. 
+                    <strong>340 grimoires — dispersés entre trois coffres différents.</strong>
+                     Les reps confessent ne jamais trouver ce dont ils ont besoin au moment des appels. Une enquête interne révèle que 
+                    <em>60% des contenus créés ne sont jamais consultés.</em>
+                </div>
+                <div class="mission-tag">⚔ Votre épreuve</div>
+                <div class="mission-text">Comment l'IA transforme cette bibliothèque en arme de performance ?</div>
+                <div class="choices" id="choices-3">
+                    <button class="choice-btn" data-key="A" onclick="answer(3,this,false)">Réorganiser manuellement tous les fichiers dans une arborescence unifiée</button>
+                    <button class="choice-btn" data-key="B" onclick="answer(3,this,false)">Supprimer les contenus non consultés et repartir de zéro</button>
+                    <button class="choice-btn" data-key="C" onclick="answer(3,this,false)">Former les reps à mieux utiliser les outils existants via un tutoriel vidéo</button>
+                    <button class="choice-btn" data-key="D" onclick="answer(3,this,true)">Déployer un moteur de recherche sémantique IA + recommandation contextuelle connectée au stade du deal dans le CRM</button>
+                </div>
+                <div class="feedback" id="feedback-3"></div>
+                <div class="door-unlock" id="unlock-3">
+                    <div class="door-graphic">🚪</div>
+                    <div class="door-text">
+                        Les grimoires s'animent...
+                        <br>
+                        La Chambre du Directeur vous attend.
+                    </div>
+                </div>
+                <button class="next-btn" id="next-3" onclick="goTo(4)">Avancer vers la salle finale →</button>
+            </div>
+            <div class="signature">
+                <span class="sig-name">Sales Enablement · AI Learning Lab</span>
+                <a class="sig-url" href="https://mdufau.github.io" target="_blank">mdufau.github.io</a>
+            </div>
+        </div>
+
+        <!-- ══ SALLE 4 ══ -->
+        <div class="screen" id="screen-4">
+            <div class="stone-panel">
+                <div class="room-badge">
+                    <div class="bdot"></div>
+                    🔓 Salle Finale — La Chambre du Directeur
+                </div>
+                <div class="door-row" id="doors-4"></div>
+                <div class="scenario-label">📜 Parchemin du gardien</div>
+                <div class="scenario-box">
+                    Le directeur commercial se lève, vous fixe : 
+                    <strong>"Notre vrai problème, ce n'est pas les outils. C'est que les reps n'adoptent pas ce qu'on leur donne. Le dernier LMS est à 18% d'utilisation."</strong>
+                     Il pose la question qui déverrouille la sortie du donjon : 
+                    <em>"Alors — l'IA va vraiment changer ça ?"</em>
+                </div>
+                <div class="mission-tag">⚔ Votre épreuve finale</div>
+                <div class="mission-text">Quelle réponse convainc un directeur commercial expérimenté et sceptique ?</div>
+                <div class="choices" id="choices-4">
+                    <button class="choice-btn" data-key="A" onclick="answer(4,this,false)">"L'IA va tout automatiser — les reps n'auront plus à faire d'efforts administratifs."</button>
+                    <button class="choice-btn" data-key="B" onclick="answer(4,this,false)">"Il suffit d'acheter le bon outil. ChatGPT résoudra le problème d'adoption."</button>
+                    <button class="choice-btn" data-key="C" onclick="answer(4,this,true)">"L'IA amplifie ce qui existe. Son impact dépend de la qualité des contenus, de l'intégration dans les workflows et de l'accompagnement au changement. Voici mon plan en 3 phases."</button>
+                    <button class="choice-btn" data-key="D" onclick="answer(4,this,false)">"Vous avez raison d'être sceptique — l'IA n'est pas encore assez mature pour nos besoins terrain."</button>
+                </div>
+                <div class="feedback" id="feedback-4"></div>
+                <div class="door-unlock" id="unlock-4">
+                    <div class="door-graphic">🏆</div>
+                    <div class="door-text">
+                        Le directeur hoche la tête.
+                        <br>
+                        <em>Vous avez traversé le donjon.</em>
+                    </div>
+                </div>
+                <button class="next-btn" id="next-4" onclick="showResult()">Voir mon score final →</button>
+            </div>
+            <div class="signature">
+                <span class="sig-name">Sales Enablement · AI Learning Lab</span>
+                <a class="sig-url" href="https://mdufau.github.io" target="_blank">mdufau.github.io</a>
+            </div>
+        </div>
+
+        <!-- ══ RESULT ══ -->
+        <div class="screen" id="screen-result">
+            <div class="stone-panel">
+                <div class="room-badge">
+                    <div class="bdot"></div>
+                    ✅ Donjon complété
+                </div>
+                <h2>
+                    Votre 
+                    <em>score</em>
+                </h2>
+                <div class="score-big" id="finalScore">
+                    —
+                    <span>/4</span>
+                </div>
+                <div class="score-sub">portes déverrouillées</div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="rc-val" id="rc-correct">—</div>
+                        <div class="rc-label">Bonnes décisions</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="rc-val" id="rc-time">—</div>
+                        <div class="rc-label">Temps total</div>
+                    </div>
+                </div>
+                <div class="insight-result" id="resultInsight"></div>
+                <button class="start-btn" onclick="showSources()">📊 Voir les sources & insights</button>
+                <button class="restart-btn" onclick="restartGame()">↺ Recommencer</button>
+            </div>
+            <div class="signature">
+                <span class="sig-name">Sales Enablement · AI Learning Lab</span>
+                <a class="sig-url" href="https://mdufau.github.io" target="_blank">mdufau.github.io</a>
+            </div>
+        </div>
+
+        <!-- ══ SOURCES ══ -->
+        <div class="screen" id="screen-sources">
+            <div class="stone-panel">
+                <div class="room-badge">
+                    <div class="bdot"></div>
+                    📚 Grimoire des Sources
+                </div>
+                <h2>
+                    Ce que dit 
+                    <em>la recherche</em>
+                </h2>
+
+                <div class="source-block">
+                    <strong>⚔ Salle 1 — Génération de contenus IA</strong>
+
+                            Les commerciaux ne consacrent que 
+                    <em>25 %</em>
+                     de leur temps à la vente active — le reste part en recherche et en tâches administratives 
+                    <em>(Bain & Company, 2025)</em>
+                    . Les outils IA permettent d'économiser de 
+                    <em>1h30 à 5h/semaine et par rep</em>
+                    <em>(LinkedIn & HubSpot, 2024-2025)</em>
+                    . En 2025, 
+                    <em>164 % plus d'entreprises</em>
+                     intègrent l'IA dans leurs programmes de formation commerciale vs l'an dernier 
+                    <em>(Highspot, 2025)</em>
+                    .
+                          
+                </div>
+                <div class="source-block bl">
+                    <strong>⚔ Salle 2 — Onboarding & Coaching IA</strong>
+                    <em>44 %</em>
+                     des organisations ayant intégré l'IA dans l'onboarding rapportent une réduction significative du temps de ramp-up 
+                    <em>(Allego, 2025)</em>
+                    . Un commercial utilisant efficacement l'IA est 
+                    <em>3,7x plus susceptible</em>
+                     d'atteindre ses objectifs 
+                    <em>(Gartner, 2025)</em>
+                    . Les managers passent 
+                    <em>13h/semaine</em>
+                     à coacher — l'analyse IA des calls libère ce temps pour la stratégie 
+                    <em>(Highspot, 2025)</em>
+                    .
+                          
+                </div>
+                <div class="source-block gr">
+                    <strong>⚔ Salle 3 — Knowledge Management augmenté</strong>
+                    <em>55 %</em>
+                     des organisations peinent à piloter leurs initiatives GTM faute d'outils unifiés 
+                    <em>(Highspot, 2025)</em>
+                    . D'ici 2027, 
+                    <em>95 %</em>
+                     des workflows de recherche commerciale démarreront via l'IA, contre moins de 20 % en 2024 
+                    <em>(Gartner, 2025)</em>
+                    . Les entreprises dotées d'une plateforme unifiée sont 
+                    <em>42 % plus susceptibles</em>
+                     d'améliorer leurs win rates 
+                    <em>(Highspot, 2025)</em>
+                    .
+                          
+                </div>
+                <div class="source-block vi">
+                    <strong>⚔ Salle Finale — Conduite du changement</strong>
+
+                            En 2025, 
+                    <em>100 %</em>
+                     des responsables Revenue Enablement utilisent l'IA générative 
+                    <em>(Allego, 2025)</em>
+                    . Pourtant, les résultats en double digit restent rares — la technologie sans adoption ni accompagnement ne génère que de petits gains 
+                    <em>(Bain & Company, 2025)</em>
+                    . L'IA amplifie ce qui existe : une bonne stratégie enablement devient excellente, une mauvaise reste mauvaise.
+                          
+                </div>
+
+                <div class="divider"></div>
+                <div style="font-family:'Nunito',sans-serif;font-size:10px;color:var(--gray-mid);font-weight:900;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Références</div>
+                <div style="font-size:13px;color:var(--gray-mid);line-height:2.2">
+
+                            Allego — AI in Revenue Enablement Report, 2025
+                    <br>
+
+                            Bain & Company — Technology Report, 2025
+                    <br>
+
+                            Gartner — AI in Sales, 2025
+                    <br>
+
+                            Highspot — State of Sales Enablement, 2025
+                    <br>
+
+                            HubSpot — State of AI in Sales, 2024
+                    <br>
+
+                            LinkedIn — State of Sales Report, 2025
+                          
+                </div>
+                <div style="margin-top:24px">
+                    <button class="start-btn" onclick="restartGame()">↺ Recommencer le donjon</button>
+                </div>
+            </div>
+            <div class="signature">
+                <span class="sig-name">Sales Enablement · AI Learning Lab</span>
+                <a class="sig-url" href="https://mdufau.github.io" target="_blank">mdufau.github.io</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+    const FB = {
+        1: {
+            ok: "La Crypte s'ouvre. <strong>Décision stratégique.</strong> Les outils IA de génération de contenus (ChatGPT, Jasper, Seismic) connectés au CRM produisent emails, fiches objections et battle cards automatiquement. Impact immédiat : 1h30 à 5h économisées par rep et par semaine <strong>(LinkedIn & HubSpot, 2024-2025)</strong>. C'est le levier le plus rapide car il s'intègre dans les workflows sans formation lourde.",
+            ko: "La porte résiste. Cette réponse n'est pas fausse, mais elle ne répond pas à l'urgence terrain. La directrice a besoin d'un impact immédiat sur le temps de vente. L'IA générative produit en 2 minutes ce qui prenait 45 minutes à un rep."
+        },
+        2: {
+            ok: "La porte cède. <strong>Excellente stratégie.</strong> Les parcours adaptatifs IA ajustent le contenu selon les lacunes de chaque rep. L'analyse de calls IA (Gong, Chorus) fournit un coaching objectif et scalable sans mobiliser les managers. Résultat documenté : <strong>44 % de réduction du temps d'onboarding</strong> (Allego, 2025).",
+            ko: "La porte tient bon. Cette approche a du mérite mais n'est pas scalable pour 8 recrues simultanément. L'IA permet de passer d'un modèle de formation ponctuelle à un apprentissage continu et personnalisé, sans multiplier les ressources humaines."
+        },
+        3: {
+            ok: "Les grimoires s'animent. <strong>Vision juste.</strong> Le vrai problème n'est pas le volume, c'est l'accessibilité. Un moteur sémantique permet de taper 'objection prix PME' et d'obtenir la ressource la plus pertinente. La recommandation CRM va plus loin : elle pousse le bon contenu selon le stade du deal — d'une bibliothèque passive à un assistant actif.",
+            ko: "La bibliothèque reste fermée. Cette approche traite le symptôme, pas la cause. Le problème n'est pas l'organisation des fichiers — c'est que les reps ne savent pas quoi chercher, quand, et n'ont pas le temps. L'IA résout les trois dimensions à la fois."
+        },
+        4: {
+            ok: "Le directeur hoche la tête. <strong>Réponse de senior.</strong> L'IA n'est pas une baguette magique — elle amplifie ce qui existe. Ce qui change : la qualité des contenus, l'intégration dans les outils du quotidien et l'accompagnement au changement. Bain & Company (2025) confirme que les résultats en double digit sont rares car l'adoption est chroniquement sous-estimée.",
+            ko: "Le directeur lève un sourcil. Cette position fragilise votre crédibilité : elle survend l'IA ou la sous-estime alors que 100 % des responsables Revenue Enablement l'utilisent déjà (Allego, 2025). La bonne réponse reconnaît la complexité tout en proposant un plan concret."
+        }
+    };
+
+    const VERDICTS = [
+    {
+        min: 0,
+        max: 1,
+        txt: "Le donjon vous a résisté sur plusieurs épreuves. L'IA en Sales Enablement recèle encore de nombreux territoires inexplorés. Chaque feedback contient des clés précieuses — repassez les salles."
+    },
+    {
+        min: 2,
+        max: 2,
+        txt: "Bonne intuition sur deux épreuves sur quatre. Vous avez une lecture opérationnelle du sujet. Quelques nuances sur l'adoption et la maturité des outils méritent d'être approfondies."
+    },
+    {
+        min: 3,
+        max: 3,
+        txt: "Solide. Vous maîtrisez les trois premiers leviers. La salle finale sur la conduite du changement est celle qui différencie un bon manager d'un excellent — c'est là que se jouent les vrais projets IA."
+    },
+    {
+        min: 4,
+        max: 4,
+        txt: "Donjon conquis, score parfait. Vous avez une vision stratégique et opérationnelle de l'IA en Sales Enablement — des contenus à l'adoption, du coaching au knowledge management. Exactement ce qu'attendent les équipes commerciales en 2025."
+    }
+    ];
+
+    let score = 0,
+        answered = {},
+        startTime = 0;
+
+    function buildDoors(n) {
+        const el = document.getElementById('doors-' + n);
+        if (!el)
+            return;
+        el.innerHTML = '';
+        for (let i = 1; i <= 4; i++) {
+            if (i > 1) {
+                const s = document.createElement('span');
+                s.className = 'door-dash';
+                s.textContent = '—';
+                el.appendChild(s);
+            }
+            const d = document.createElement('span');
+            d.className = 'door-icon' + (i < n ? ' done' : i === n ? ' active' : '');
+            d.textContent = i < n ? '🔓' : i === n ? '🔐' : '🔒';
+            el.appendChild(d);
+        }
+    }
+
+    function updateProgress(step) {
+        document.getElementById('progressArea').classList.add('show');
+        document.getElementById('progressFill').style.width = ((step - 1) / 4 * 100) + '%';
+        document.getElementById('progressText').textContent = 'Salle ' + step + ' / 4';
+    }
+
+    function startGame() {
+        score = 0;
+        answered = {};
+        startTime = Date.now();
+        goTo(1);
+    }
+
+    function goTo(n) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-' + n).classList.add('active');
+        if (n >= 1 && n <= 4) {
+            updateProgress(n);
+            buildDoors(n);
+        }
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    function answer(room, btn, isCorrect) {
+        if (answered[room])
+            return;
+        answered[room] = true;
+        const all = document.querySelectorAll('#choices-' + room + ' .choice-btn');
+        all.forEach(b => b.classList.add('disabled'));
+        if (isCorrect) {
+            btn.classList.remove('disabled');
+            btn.classList.add('correct');
+            score++;
+        }
+        else {
+            btn.classList.remove('disabled');
+            btn.classList.add('wrong');
+            all.forEach(b => {
+                if (b.getAttribute('onclick').includes(',true')) {
+                    {
+                        b.classList.remove('disabled');
+                        b.classList.add('reveal-correct');
+                    }
+                }
+            });
+        }
+        const fb = document.getElementById('feedback-' + room);
+        fb.className = 'feedback ' + (isCorrect ? 'show-ok' : 'show-ko');
+        fb.innerHTML = '<div class="fb-label">' + (isCorrect ? '✓ La porte s\'ouvre' : '✗ La porte résiste') + '</div>' + FB[room][isCorrect ? 'ok' : 'ko'];
+        if (isCorrect)
+            setTimeout(() => document.getElementById('unlock-' + room).classList.add('show'), 420);
+        setTimeout(() => document.getElementById('next-' + room).classList.add('show'), isCorrect ? 1300 : 650);
+    }
+
+    function getElapsed() {
+        const s = Math.round((Date.now() - startTime) / 1000);
+        return s < 60 ? s + 's' : Math.floor(s / 60) + 'min ' + (s % 60) + 's';
+    }
+
+    function showResult() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-result').classList.add('active');
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressText').textContent = 'Terminé';
+        document.getElementById('finalScore').innerHTML = score + '<span>/4</span>';
+        document.getElementById('rc-correct').textContent = score + '/4';
+        document.getElementById('rc-time').textContent = getElapsed();
+        const v = VERDICTS.find(x => score >= x.min && score <= x.max);
+        document.getElementById('resultInsight').innerHTML = '<strong>Analyse :</strong> ' + v.txt;
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    function showSources() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-sources').classList.add('active');
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    function restartGame() {
+        score = 0;
+        answered = {};
+        for (let r = 1; r <= 4; r++) {
+            document.querySelectorAll('#choices-' + r + ' .choice-btn').forEach(b => b.classList.remove('correct', 'wrong', 'reveal-correct', 'disabled'));
+            const fb = document.getElementById('feedback-' + r);
+            if (fb) {
+                fb.className = 'feedback';
+                fb.innerHTML = '';
+            }
+            const nb = document.getElementById('next-' + r);
+            if (nb)
+                nb.classList.remove('show');
+            const ul = document.getElementById('unlock-' + r);
+            if (ul)
+                ul.classList.remove('show');
+        }
+        document.getElementById('progressArea').classList.remove('show');
+        document.getElementById('progressFill').style.width = '0%';
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-intro').classList.add('active');
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3 leviers IA pour le Sales Enablement — Note prospective 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #E8572A;
+  --ink: #1C1B18;
+  --sand: #F7F5F0;
+  --white: #FFFFFF;
+  --gray-mid: #6B6760;
+  --gray-light: #C8C5BE;
+  --blue: #2A7BE8;
+  --green: #27A86B;
+  --yellow: #F5C842;
+  --violet: #7B5CF5;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--sand);
+  font-family: 'Nunito', sans-serif;
+  color: var(--ink);
+  line-height: 1.7;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+  padding: 80px 24px 72px;
+  text-align: center;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(232,87,42,0.18) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(232,87,42,0.1);
+  border: 1px solid rgba(232,87,42,0.3);
+  border-radius: 2rem;
+  padding: 6px 16px;
+  font-size: 11px; font-weight: 900;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 28px;
+  position: relative;
+}
+.hero-badge-dot { width: 6px; height: 6px; background: var(--orange); border-radius: 50%; box-shadow: 0 0 7px var(--orange); }
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: clamp(32px, 5.5vw, 58px);
+  line-height: 1.1;
+  color: var(--sand);
+  margin-bottom: 20px;
+  letter-spacing: -.02em;
+  position: relative;
+}
+.hero h1 em { font-style: italic; color: var(--orange); }
+
+.hero-meta {
+  font-size: 13px; font-weight: 600;
+  color: rgba(247,245,240,.45);
+  letter-spacing: .06em;
+  position: relative;
+  margin-bottom: 36px;
+}
+
+.hero-pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; }
+.pill {
+  font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 2rem;
+}
+.pill-o { background: rgba(232,87,42,.12); color: var(--orange); border: 1px solid rgba(232,87,42,.25); }
+.pill-v { background: rgba(123,92,245,.12); color: var(--violet); border: 1px solid rgba(123,92,245,.25); }
+.pill-g { background: rgba(39,168,107,.12); color: var(--green); border: 1px solid rgba(39,168,107,.25); }
+
+/* ── INTRO BAND ── */
+.intro-band {
+  background: var(--white);
+  padding: 52px 24px;
+}
+.intro-inner {
+  max-width: 760px; margin: 0 auto;
+}
+.section-label {
+  font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 12px;
+}
+.intro-band h2 {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: clamp(22px, 3vw, 30px);
+  color: var(--ink); margin-bottom: 18px; line-height: 1.3;
+}
+.intro-band h2 em { font-style: italic; color: var(--orange); }
+.intro-text { font-size: 15px; line-height: 1.85; color: var(--gray-mid); margin-bottom: 14px; }
+.intro-text strong { color: var(--ink); font-weight: 800; }
+
+/* STAT STRIP */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--gray-light);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 36px;
+  box-shadow: 0 4px 24px rgba(28,27,24,.09);
+}
+.stat-cell {
+  background: var(--white);
+  padding: 24px 20px;
+  text-align: center;
+}
+.stat-val {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: 36px; color: var(--ink);
+  line-height: 1; margin-bottom: 6px;
+}
+.stat-val span { color: var(--orange); }
+.stat-label { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--gray-mid); }
+.stat-source { font-size: 10px; color: var(--gray-light); margin-top: 4px; font-weight: 600; }
+
+/* ── LEVIER SECTIONS ── */
+.levier-section { padding: 64px 24px; }
+.levier-section:nth-child(odd) { background: var(--sand); }
+.levier-section:nth-child(even) { background: var(--white); }
+
+.levier-inner { max-width: 760px; margin: 0 auto; }
+
+.levier-num {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: 100px; line-height: 1;
+  color: var(--ink); opacity: .05;
+  position: absolute; top: -16px; right: 0;
+  pointer-events: none; user-select: none;
+}
+.levier-header { position: relative; margin-bottom: 28px; }
+
+.levier-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 2rem;
+  margin-bottom: 12px;
+}
+.tag-orange { background: rgba(232,87,42,.1); color: var(--orange); border: 1px solid rgba(232,87,42,.22); }
+.tag-blue   { background: rgba(42,123,232,.1); color: var(--blue);   border: 1px solid rgba(42,123,232,.22); }
+.tag-green  { background: rgba(39,168,107,.1); color: var(--green);  border: 1px solid rgba(39,168,107,.22); }
+.tag-violet { background: rgba(123,92,245,.1); color: var(--violet); border: 1px solid rgba(123,92,245,.22); }
+
+.levier-header h2 {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: clamp(22px, 3vw, 30px);
+  color: var(--ink); line-height: 1.25;
+}
+.levier-header h2 em { font-style: italic; color: var(--orange); }
+
+.levier-desc { font-size: 15px; line-height: 1.85; color: var(--gray-mid); margin-bottom: 28px; }
+.levier-desc strong { color: var(--ink); font-weight: 800; }
+
+/* STAT CARDS */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--gray-light);
+  border-radius: 8px;
+  padding: 20px;
+  transition: transform .2s, box-shadow .2s;
+}
+.levier-section:nth-child(even) .stat-card { background: var(--sand); }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 36px rgba(28,27,24,.12); }
+
+.stat-card-val {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: 30px; line-height: 1; margin-bottom: 6px;
+  color: var(--ink);
+}
+.stat-card-val span { color: var(--orange); }
+.stat-card-val.blue span   { color: var(--blue); }
+.stat-card-val.green span  { color: var(--green); }
+.stat-card-val.violet span { color: var(--violet); }
+
+.stat-card-desc { font-size: 13px; line-height: 1.6; color: var(--gray-mid); margin-bottom: 8px; }
+.stat-card-source { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray-light); }
+
+/* APPLICATIONS */
+.appli-title {
+  font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink); margin-bottom: 14px;
+}
+.appli-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.appli-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 14px; line-height: 1.65; color: var(--gray-mid);
+}
+.appli-arrow {
+  flex-shrink: 0; width: 20px; height: 20px; margin-top: 1px;
+  background: rgba(232,87,42,.1);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: var(--orange); font-weight: 900;
+}
+.appli-item strong { color: var(--ink); font-weight: 800; }
+
+.outils-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(28,27,24,.04);
+  border: 1px solid var(--gray-light);
+  border-radius: 2rem;
+  padding: 6px 14px;
+  font-size: 11px; font-weight: 800; color: var(--gray-mid);
+}
+.outils-tag em { font-style: normal; color: var(--ink); }
+
+/* ── SYNTHESE ── */
+.synthese { background: var(--ink); padding: 72px 24px; }
+.synthese-inner { max-width: 760px; margin: 0 auto; }
+
+.synthese h2 {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: clamp(24px, 3.5vw, 34px);
+  color: var(--sand); margin-bottom: 20px; line-height: 1.2;
+}
+.synthese h2 em { font-style: italic; color: var(--orange); }
+.synthese-text { font-size: 15px; line-height: 1.85; color: rgba(247,245,240,.55); margin-bottom: 36px; }
+.synthese-text strong { color: var(--sand); }
+
+/* PHASES */
+.phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 40px; }
+.phase-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-top: 3px solid var(--orange);
+  border-radius: 6px;
+  padding: 22px 18px;
+  transition: background .2s, transform .2s;
+}
+.phase-card:hover { background: rgba(255,255,255,.07); transform: translateY(-3px); }
+.phase-period {
+  font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 10px;
+}
+.phase-title {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: 16px; color: var(--sand); margin-bottom: 10px; line-height: 1.3;
+}
+.phase-desc { font-size: 13px; line-height: 1.7; color: rgba(247,245,240,.5); }
+
+/* VIRTUOUS CIRCLE */
+.circle-label {
+  font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--orange); text-align: center; margin-bottom: 20px;
+}
+.circle-row {
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: 8px;
+}
+.circle-node {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 12px; font-weight: 800;
+  color: var(--sand); text-align: center; white-space: nowrap;
+}
+.circle-arrow { color: var(--orange); font-size: 16px; font-weight: 900; }
+
+/* ── SOURCES ── */
+.sources { background: var(--white); padding: 56px 24px; }
+.sources-inner { max-width: 760px; margin: 0 auto; }
+.sources h2 {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: 22px; color: var(--ink); margin-bottom: 24px;
+}
+.sources h2 em { font-style: italic; color: var(--orange); }
+.source-row {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--sand);
+  font-size: 13px; color: var(--gray-mid); line-height: 1.6;
+}
+.source-row:last-child { border-bottom: none; }
+.source-dot { width: 6px; height: 6px; background: var(--orange); border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.source-row strong { color: var(--ink); font-weight: 800; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink);
+  padding: 32px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-name {
+  font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(247,245,240,.35);
+}
+.footer-url {
+  font-size: 12px; font-weight: 900; letter-spacing: .06em;
+  color: var(--orange); text-decoration: none; opacity: .8;
+}
+.footer-url:hover { opacity: 1; }
+
+/* ── ANIMATIONS ── */
+.reveal {
+  opacity: 0; transform: translateY(22px);
+  transition: opacity .55s ease, transform .55s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media(max-width:600px){
+  .stat-strip { grid-template-columns: 1fr 1fr; }
+  .phases { grid-template-columns: 1fr; }
+  .circle-row { flex-direction: column; align-items: center; }
+  .circle-arrow { transform: rotate(90deg); }
+  footer { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-badge"><div class="hero-badge-dot"></div>Note prospective · Février 2026</div>
+  <h1>3 leviers <em>IA</em> concrets<br>pour le Sales Enablement</h1>
+  <div class="hero-meta">Recherche & Sources · Bain & Company · Gartner · McKinsey · Highspot · Allego · HubSpot</div>
+  <div class="hero-pills">
+    <span class="pill pill-o">Sales Enablement</span>
+    <span class="pill pill-v">Intelligence Artificielle</span>
+    <span class="pill pill-g">Basé sur la recherche 2025</span>
+  </div>
+</section>
+
+<!-- ── CONTEXTE & STATS ── -->
+<section class="intro-band">
+  <div class="intro-inner">
+    <div class="section-label reveal">Contexte & enjeu</div>
+    <h2 class="reveal">L'IA est déjà un avantage <em>concurrentiel mesurable</em></h2>
+    <p class="intro-text reveal">En 2025, <strong>100 % des responsables Revenue Enablement</strong> déclarent utiliser l'IA générative dans leurs programmes, contre 62 % en 2024 (Allego, 2025). Les équipes qui adoptent l'IA closent 30 % plus de deals, réduisent leur cycle de vente de 51 % et accélèrent l'onboarding de 44 %.</p>
+    <p class="intro-text reveal">Pour une scale-up SaaS en croissance, intégrer l'IA au Sales Enablement n'est pas un luxe. C'est un levier de performance direct, applicable immédiatement sur <strong>trois axes prioritaires</strong>.</p>
+
+    <div class="stat-strip reveal">
+      <div class="stat-cell">
+        <div class="stat-val">30<span>%</span></div>
+        <div class="stat-label">de deals en plus</div>
+        <div class="stat-source">Bain & Company, 2025</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-val">51<span>%</span></div>
+        <div class="stat-label">cycle de vente réduit</div>
+        <div class="stat-source">Allego, 2025</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-val">44<span>%</span></div>
+        <div class="stat-label">onboarding accéléré</div>
+        <div class="stat-source">Allego, 2025</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-val">100<span>%</span></div>
+        <div class="stat-label">des leaders utilisent l'IA</div>
+        <div class="stat-source">Allego, 2025</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LEVIER 1 ── -->
+<section class="levier-section">
+  <div class="levier-inner">
+    <div class="levier-header reveal">
+      <div class="levier-num">01</div>
+      <div class="levier-tag tag-orange">Levier 1 · Contenus</div>
+      <h2>La génération de contenus<br>commerciaux <em>augmentée</em></h2>
+    </div>
+
+    <p class="levier-desc reveal">Les équipes commerciales passent encore trop de temps à chercher le bon contenu plutôt qu'à vendre. <strong>Bain & Company (2025)</strong> estime que les commerciaux ne consacrent que <strong>25 % de leur temps à la vente active</strong> — le reste part en tâches administratives et en recherche de ressources.</p>
+
+    <div class="stats-row reveal">
+      <div class="stat-card">
+        <div class="stat-card-val"><span>+50 %</span></div>
+        <div class="stat-card-desc">de leads qualifiés générés grâce à l'IA appliquée à la prospection et à la personnalisation des contenus</div>
+        <div class="stat-card-source">McKinsey, 2025</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-val">1h30 <span>à</span> 5h</div>
+        <div class="stat-card-desc">économisées par semaine et par commercial sur la recherche, la rédaction d'emails et la mise à jour CRM</div>
+        <div class="stat-card-source">LinkedIn & HubSpot, 2024-2025</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-val"><span>+164 %</span></div>
+        <div class="stat-card-desc">d'entreprises utilisant l'IA dans leurs programmes de formation commerciale en un an</div>
+        <div class="stat-card-source">Highspot, 2025</div>
+      </div>
+    </div>
+
+    <div class="appli-title reveal">Applications concrètes</div>
+    <div class="appli-list reveal">
+      <div class="appli-item"><div class="appli-arrow">→</div><div>Génération automatique de <strong>fiches objections et battle cards</strong> à partir de la roadmap produit, via des outils comme ChatGPT, Notion AI ou Jasper</div></div>
+      <div class="appli-item"><div class="appli-arrow">→</div><div>Personnalisation des <strong>séquences de prospection SDR</strong> par secteur client grâce à des modèles LLM alimentés par les données CRM</div></div>
+      <div class="appli-item"><div class="appli-arrow">→</div><div>Mise à jour <strong>dynamique de la bibliothèque</strong> : dès qu'un produit évolue, les fiches argumentaires sont régénérées et poussées automatiquement aux équipes</div></div>
+    </div>
+
+    <div class="outils-tag reveal">🛠 Outils de référence : <em>ChatGPT · Jasper · Notion AI · Seismic · Highspot</em></div>
+  </div>
+</section>
+
+<!-- ── LEVIER 2 ── -->
+<section class="levier-section">
+  <div class="levier-inner">
+    <div class="levier-header reveal">
+      <div class="levier-num">02</div>
+      <div class="levier-tag tag-blue">Levier 2 · Formation</div>
+      <h2>L'onboarding et la formation continue<br><em>personnalisés par rôle</em></h2>
+    </div>
+
+    <p class="levier-desc reveal">La formation traditionnelle est trop lente pour les environnements en forte croissance. L'IA permet de passer d'un modèle de formation ponctuelle à un modèle d'apprentissage <strong>continu, adaptatif et mesurable</strong>.</p>
+
+    <div class="stats-row reveal">
+      <div class="stat-card">
+        <div class="stat-card-val blue"><span>44 %</span></div>
+        <div class="stat-card-desc">de réduction du temps d'onboarding constatée par les organisations ayant intégré l'IA dans leurs parcours d'intégration</div>
+        <div class="stat-card-source">Allego, 2025</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-val blue">3,7<span>x</span></div>
+        <div class="stat-card-desc">plus de probabilité d'atteindre ses objectifs pour un commercial utilisant efficacement les outils IA vs sans IA</div>
+        <div class="stat-card-source">Gartner, 2025</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-val blue">13h<span>/sem</span></div>
+        <div class="stat-card-desc">passées par manager à coacher leurs équipes — l'analyse IA des calls libère ce temps pour la stratégie</div>
+        <div class="stat-card-source">Highspot, 2025</div>
+      </div>
+    </div>
+
+    <div class="appli-title reveal">Applications concrètes</div>
+    <div class="appli-list reveal">
+      <div class="appli-item"><div class="appli-arrow">→</div><div>Parcours d'onboarding <strong>adaptatifs par rôle</strong> (SDR, Sales, AM) : l'IA ajuste le contenu et le rythme selon les lacunes détectées via des quiz et des simulations</div></div>
+      <div class="appli-item"><div class="appli-arrow">→</div><div><strong>Coaching IA en temps réel</strong> sur les calls : analyse automatique des conversations (ratio écoute/parole, détection des objections, moments clés) via Gong ou Chorus</div></div>
+      <div class="appli-item"><div class="appli-arrow">→</div><div><strong>Micro-learning IA</strong> : modules courts générés après chaque mise à jour produit, envoyés directement dans les outils du quotidien (Slack, mobile)</div></div>
+    </div>
+
+    <div class="outils-tag reveal">🛠 Outils de référence : <em>Gong · Chorus (ZoomInfo) · Highspot · 360Learning AI · Seismic Learning</em></div>
+  </div>
+</section>
+
+<!-- ── LEVIER 3 ── -->
+<section class="levier-section">
+  <div class="levier-inner">
+    <div class="levier-header reveal">
+      <div class="levier-num">03</div>
+      <div class="levier-tag tag-green">Levier 3 · Knowledge</div>
+      <h2>La bibliothèque de contenus<br><em>intelligente</em></h2>
+    </div>
+
+    <p class="levier-desc reveal">Le vrai problème du Sales Enablement n'est pas le manque de contenu — c'est <strong>l'accès au bon contenu, au bon moment</strong>. Une étude Productiv (2024) révèle que 40 % des licences SaaS sont inutilisées. Le même phénomène s'applique aux bibliothèques de ressources commerciales : les contenus existent, mais les équipes ne les trouvent pas.</p>
+
+    <div class="stats-row reveal">
+      <div class="stat-card">
+        <div class="stat-card-val green"><span>42 %</span></div>
+        <div class="stat-card-desc">plus de chances d'améliorer les win rates pour les entreprises dotées d'une plateforme d'enablement unifiée et bien intégrée</div>
+        <div class="stat-card-source">Highspot, 2025</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-val green"><span>95 %</span></div>
+        <div class="stat-card-desc">des workflows de recherche commerciale démarreront via l'IA d'ici 2027, contre moins de 20 % en 2024</div>
+        <div class="stat-card-source">Gartner, 2025</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-val green"><span>55 %</span></div>
+        <div class="stat-card-desc">des organisations incapables de piloter efficacement leurs initiatives go-to-market faute d'outils unifiés</div>
+        <div class="stat-card-source">Highspot, 2025</div>
+      </div>
+    </div>
+
+    <div class="appli-title reveal">Applications concrètes</div>
+    <div class="appli-list reveal">
+      <div class="appli-item"><div class="appli-arrow">→</div><div><strong>Moteur de recherche sémantique</strong> : un SDR saisit "objection prix PME" et l'IA remonte instantanément la fiche la plus pertinente, mise à jour</div></div>
+      <div class="appli-item"><div class="appli-arrow">→</div><div><strong>Recommandation contextuelle</strong> : l'IA suggère automatiquement le contenu adapté selon le stade de l'opportunité dans le CRM (découverte, démo, négociation…)</div></div>
+      <div class="appli-item"><div class="appli-arrow">→</div><div>Tableaux de bord d'<strong>adoption par contenu, rôle et segment</strong> pour alimenter une amélioration continue du catalogue</div></div>
+    </div>
+
+    <div class="outils-tag reveal">🛠 Outils de référence : <em>Seismic · Showpad · Highspot · Notion AI · ChatGPT Enterprise</em></div>
+  </div>
+</section>
+
+<!-- ── SYNTHESE ── -->
+<section class="synthese">
+  <div class="synthese-inner">
+    <div class="section-label reveal" style="color:var(--orange)">Synthèse & recommandation</div>
+    <h2 class="reveal">Ces trois leviers forment<br>un <em>système</em></h2>
+    <p class="synthese-text reveal">La génération de contenus alimente la bibliothèque, qui alimente la formation, qui alimente la performance terrain mesurée dans le CRM — et les données CRM permettent d'améliorer les contenus. C'est un <strong>cercle vertueux</strong>.</p>
+
+    <div class="circle-label reveal">Cercle vertueux</div>
+    <div class="circle-row reveal">
+      <div class="circle-node">Contenus IA</div>
+      <div class="circle-arrow">→</div>
+      <div class="circle-node">Bibliothèque intelligente</div>
+      <div class="circle-arrow">→</div>
+      <div class="circle-node">Formation adaptative</div>
+      <div class="circle-arrow">→</div>
+      <div class="circle-node">Performance CRM</div>
+      <div class="circle-arrow">→</div>
+      <div class="circle-node">Contenus IA</div>
+    </div>
+
+    <div style="margin: 48px 0 20px">
+      <div class="section-label reveal" style="color:var(--orange)">Priorisation recommandée</div>
+    </div>
+    <div class="phases">
+      <div class="phase-card reveal">
+        <div class="phase-period">0 – 3 mois</div>
+        <div class="phase-title">Coaching & analyse de calls</div>
+        <div class="phase-desc">Intégrer un outil d'analyse de calls (Gong / Chorus) pour générer des insights coaching objectifs et alimenter la mise à jour des argumentaires.</div>
+      </div>
+      <div class="phase-card reveal">
+        <div class="phase-period">3 – 6 mois</div>
+        <div class="phase-title">Bibliothèque intelligente</div>
+        <div class="phase-desc">Déployer un moteur de recherche sémantique sur la bibliothèque de ressources, connecté au CRM pour une recommandation contextuelle.</div>
+      </div>
+      <div class="phase-card reveal">
+        <div class="phase-period">6 – 12 mois</div>
+        <div class="phase-title">Onboarding adaptatif</div>
+        <div class="phase-desc">Parcours d'onboarding adaptatifs par rôle, avec boucles de feedback automatisées et tableaux de bord d'adoption.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOURCES ── -->
+<section class="sources">
+  <div class="sources-inner">
+    <h2 class="reveal"><em>Sources</em> & références</h2>
+    <div class="reveal">
+      <div class="source-row"><div class="source-dot"></div><div><strong>Allego</strong> — AI in Revenue Enablement Report, 2025</div></div>
+      <div class="source-row"><div class="source-dot"></div><div><strong>Bain & Company</strong> — AI Is Transforming Productivity, Technology Report, 2025</div></div>
+      <div class="source-row"><div class="source-dot"></div><div><strong>Gartner</strong> — AI in Sales, 2025</div></div>
+      <div class="source-row"><div class="source-dot"></div><div><strong>Highspot</strong> — State of Sales Enablement, 2025</div></div>
+      <div class="source-row"><div class="source-dot"></div><div><strong>HubSpot</strong> — State of AI in Sales, 2024</div></div>
+      <div class="source-row"><div class="source-dot"></div><div><strong>LinkedIn</strong> — State of Sales Report, 2025</div></div>
+      <div class="source-row"><div class="source-dot"></div><div><strong>McKinsey & Company</strong> — The State of AI, 2024-2025</div></div>
+      <div class="source-row"><div class="source-dot"></div><div><strong>Harvard Business Impact</strong> — Global Leadership Development Study, 2025</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <span class="footer-name">Sales Enablement · AI Note · Février 2026</span>
+  <a class="footer-url" href="https://mdufau.github.io" target="_blank">mdufau.github.io</a>
+</footer>
+
+<script>
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 60);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

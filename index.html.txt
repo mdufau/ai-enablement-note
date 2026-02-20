@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Sales Enablement Lab — Mélanie Dufau DCM</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #E8572A;
+  --ink: #1C1B18;
+  --sand: #F7F5F0;
+  --white: #FFFFFF;
+  --gray-mid: #6B6760;
+  --gray-light: #C8C5BE;
+  --blue: #2A7BE8;
+  --green: #27A86B;
+  --yellow: #F5C842;
+  --violet: #7B5CF5;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  font-family: 'Nunito', sans-serif;
+  color: var(--sand);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(232,87,42,0.13) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 0% 60%, rgba(42,123,232,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 100% 70%, rgba(123,92,245,0.05) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+
+/* subtle grid */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.015) 59px, rgba(255,255,255,0.015) 60px),
+    repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(255,255,255,0.01) 79px, rgba(255,255,255,0.01) 80px);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── WRAP ── */
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 80px 24px 80px;
+}
+
+/* ── HEADER ── */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(232,87,42,0.09);
+  border: 1px solid rgba(232,87,42,0.25);
+  border-radius: 2rem;
+  padding: 5px 16px;
+  font-size: 10px; font-weight: 900;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 32px;
+}
+.eyebrow-dot { width: 6px; height: 6px; background: var(--orange); border-radius: 50%; box-shadow: 0 0 7px var(--orange); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+h1 {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: clamp(38px, 6vw, 66px);
+  line-height: 1.08; letter-spacing: -.02em;
+  color: var(--sand);
+  margin-bottom: 24px;
+}
+h1 em { font-style: italic; color: var(--orange); text-shadow: 0 0 32px rgba(232,87,42,0.4); }
+
+.hero-desc {
+  font-size: 16px; line-height: 1.85;
+  color: rgba(247,245,240,0.5);
+  max-width: 580px;
+  margin-bottom: 40px;
+}
+.hero-desc strong { color: var(--sand); }
+
+/* PROFILE STRIP */
+.profile-strip {
+  display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px 24px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  margin-bottom: 72px;
+}
+.profile-avatar {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--orange), #b83d15);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--white);
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(232,87,42,0.3);
+}
+.profile-info { flex: 1; min-width: 0; }
+.profile-name {
+  font-size: 14px; font-weight: 900;
+  color: var(--sand); line-height: 1.3;
+}
+.profile-role {
+  font-size: 12px; font-weight: 600;
+  color: rgba(247,245,240,0.4);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.profile-links { display: flex; gap: 10px; flex-wrap: wrap; }
+.profile-link {
+  font-size: 11px; font-weight: 900; letter-spacing: .06em;
+  color: var(--orange); text-decoration: none;
+  padding: 4px 12px;
+  background: rgba(232,87,42,0.08);
+  border: 1px solid rgba(232,87,42,0.2);
+  border-radius: 2rem;
+  transition: all .2s;
+}
+.profile-link:hover { background: rgba(232,87,42,0.18); color: var(--sand); }
+
+/* ── SECTION TITLE ── */
+.section-label {
+  font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 20px;
+}
+
+/* ── RESOURCE CARDS ── */
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 56px; }
+
+.resource-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 36px 32px;
+  position: relative; overflow: hidden;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  display: flex; flex-direction: column;
+  text-decoration: none;
+}
+.resource-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  transition: opacity .25s;
+  opacity: 0.6;
+}
+.resource-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 60px rgba(0,0,0,0.5);
+}
+.resource-card:hover::before { opacity: 1; }
+
+/* card — escape game */
+.card-escape::before { background: linear-gradient(90deg, transparent, var(--orange), transparent); }
+.card-escape:hover { border-color: rgba(232,87,42,0.3); }
+
+/* card — note */
+.card-note::before { background: linear-gradient(90deg, transparent, var(--violet), transparent); }
+.card-note:hover { border-color: rgba(123,92,245,0.3); }
+
+/* big number bg */
+.card-num {
+  position: absolute; bottom: -10px; right: 12px;
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: 120px; line-height: 1;
+  opacity: 0.04; user-select: none; pointer-events: none;
+  color: var(--sand);
+}
+
+.card-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 2rem;
+  margin-bottom: 20px; width: fit-content;
+}
+.tag-escape { background: rgba(232,87,42,0.1); color: var(--orange); border: 1px solid rgba(232,87,42,0.22); }
+.tag-note   { background: rgba(123,92,245,0.1); color: var(--violet); border: 1px solid rgba(123,92,245,0.22); }
+
+.card-emoji { font-size: 36px; margin-bottom: 16px; display: block; }
+
+.card-title {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: clamp(18px, 2.5vw, 24px); line-height: 1.25;
+  color: var(--sand);
+  margin-bottom: 12px;
+}
+.card-title em { font-style: italic; color: var(--orange); }
+.card-note .card-title em { color: var(--violet); }
+
+.card-desc {
+  font-size: 13px; line-height: 1.75;
+  color: rgba(247,245,240,0.45);
+  margin-bottom: 28px; flex: 1;
+}
+.card-desc strong { color: rgba(247,245,240,0.75); }
+
+/* pills row */
+.card-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 28px; }
+.cpill {
+  font-size: 10px; font-weight: 900; letter-spacing: .07em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 2rem;
+}
+.cp-o { background: rgba(232,87,42,0.1); color: var(--orange); }
+.cp-y { background: rgba(245,200,66,0.1); color: var(--yellow); }
+.cp-v { background: rgba(123,92,245,0.1); color: var(--violet); }
+.cp-g { background: rgba(39,168,107,0.1); color: var(--green); }
+.cp-b { background: rgba(42,123,232,0.1); color: var(--blue); }
+
+.card-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 900; letter-spacing: .04em;
+  color: var(--sand);
+  padding: 11px 22px;
+  border-radius: 2rem;
+  transition: all .2s;
+  border: 1px solid rgba(255,255,255,0.12);
+  width: fit-content;
+}
+.card-escape .card-cta { background: var(--orange); border-color: var(--orange); color: var(--white); box-shadow: 0 4px 20px rgba(232,87,42,0.3); }
+.card-escape .card-cta:hover { background: #ff6b3d; transform: translateY(-1px); box-shadow: 0 6px 28px rgba(232,87,42,0.45); }
+.card-note .card-cta { background: var(--violet); border-color: var(--violet); color: var(--white); box-shadow: 0 4px 20px rgba(123,92,245,0.25); }
+.card-note .card-cta:hover { background: #9070ff; transform: translateY(-1px); box-shadow: 0 6px 28px rgba(123,92,245,0.4); }
+
+/* ── STATS BAR ── */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 72px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.stat-cell {
+  background: rgba(255,255,255,0.025);
+  padding: 24px 18px; text-align: center;
+  transition: background .2s;
+}
+.stat-cell:hover { background: rgba(255,255,255,0.05); }
+.stat-val {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: 32px; color: var(--sand); line-height: 1; margin-bottom: 6px;
+}
+.stat-val span { color: var(--orange); }
+.stat-label { font-size: 10px; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; color: rgba(247,245,240,0.35); }
+
+/* ── ABOUT ── */
+.about-block {
+  padding: 40px 40px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-left: 3px solid var(--orange);
+  border-radius: 8px;
+  margin-bottom: 56px;
+}
+.about-block h3 {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: 20px; color: var(--sand); margin-bottom: 14px;
+}
+.about-block h3 em { font-style: italic; color: var(--orange); }
+.about-text {
+  font-size: 14px; line-height: 1.85;
+  color: rgba(247,245,240,0.5);
+}
+.about-text strong { color: rgba(247,245,240,0.85); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding-top: 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-left { display: flex; flex-direction: column; gap: 4px; }
+.footer-name {
+  font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(247,245,240,0.3);
+}
+.footer-copy {
+  font-size: 11px; font-weight: 600;
+  color: rgba(247,245,240,0.2);
+}
+.footer-url {
+  font-size: 12px; font-weight: 900; letter-spacing: .06em;
+  color: var(--orange); text-decoration: none; opacity: .7;
+}
+.footer-url:hover { opacity: 1; }
+
+/* ── REVEAL ── */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media(max-width: 640px) {
+  .cards { grid-template-columns: 1fr; }
+  .profile-strip { flex-direction: column; align-items: flex-start; }
+  .stats-bar { grid-template-columns: 1fr 1fr; }
+  footer { flex-direction: column; align-items: flex-start; }
+  .about-block { padding: 28px 22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="eyebrow reveal"><div class="eyebrow-dot"></div>AI Sales Enablement · Ressources 2026</div>
+
+  <h1 class="reveal">Activer l'<em>IA</em><br>au service des équipes<br>commerciales</h1>
+
+  <p class="hero-desc reveal">Deux ressources pratiques pour comprendre et déployer l'intelligence artificielle dans vos programmes de <strong>Sales Enablement</strong> — une note prospective appuyée sur la recherche, et un escape game pour tester vos décisions.</p>
+
+  <!-- PROFILE -->
+  <div class="profile-strip reveal">
+    <div class="profile-avatar">M</div>
+    <div class="profile-info">
+      <div class="profile-name">Mélanie Dufau Casanabe Miramon</div>
+      <div class="profile-role">Senior L&D & Sales Excellence · 15+ ans · AVIV Group · Apple France</div>
+    </div>
+    <div class="profile-links">
+      <a class="profile-link" href="https://www.linkedin.com/in/mdufau" target="_blank">LinkedIn</a>
+      <a class="profile-link" href="https://mdufau.github.io" target="_blank">Portfolio</a>
+    </div>
+  </div>
+
+  <!-- CARDS -->
+  <div class="section-label reveal">Ressources disponibles</div>
+  <div class="cards">
+
+    <!-- ESCAPE GAME -->
+    <a class="resource-card card-escape reveal" href="escape-game.html">
+      <div class="card-num">01</div>
+      <div class="card-tag tag-escape">Escape Game · Interactif</div>
+      <span class="card-emoji">🗝</span>
+      <div class="card-title">The AI<br><em>Sales</em> Dungeon</div>
+      <p class="card-desc">Traversez 4 salles, prenez des <strong>décisions stratégiques</strong> sur l'IA, déverrouillez les portes. Chaque bonne réponse est appuyée par des données réelles.</p>
+      <div class="card-pills">
+        <span class="cpill cp-o">4 salles</span>
+        <span class="cpill cp-y">~10 min</span>
+        <span class="cpill cp-o">Décisions IA</span>
+      </div>
+      <div class="card-cta">🗝 Jouer maintenant →</div>
+    </a>
+
+    <!-- NOTE -->
+    <a class="resource-card card-note reveal" href="note.html">
+      <div class="card-num">02</div>
+      <div class="card-tag tag-note">Note prospective · Recherche</div>
+      <span class="card-emoji">📊</span>
+      <div class="card-title">3 leviers <em>IA</em><br>pour le Sales Enablement</div>
+      <p class="card-desc">Contenus, onboarding, knowledge management. <strong>3 leviers actionnables</strong>, sourçés sur la recherche 2025 (Gartner, McKinsey, Highspot, Allego).</p>
+      <div class="card-pills">
+        <span class="cpill cp-v">3 leviers</span>
+        <span class="cpill cp-g">Sources 2025</span>
+        <span class="cpill cp-b">Plan 3 phases</span>
+      </div>
+      <div class="card-cta">📊 Lire la note →</div>
+    </a>
+
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar reveal">
+    <div class="stat-cell">
+      <div class="stat-val">30<span>%</span></div>
+      <div class="stat-label">deals en plus avec l'IA</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">44<span>%</span></div>
+      <div class="stat-label">onboarding accéléré</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">100<span>%</span></div>
+      <div class="stat-label">des leaders utilisent l'IA</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">3,7<span>x</span></div>
+      <div class="stat-label">plus de chances d'atteindre ses objectifs</div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="about-block reveal">
+    <h3>Pourquoi ces <em>ressources</em> ?</h3>
+    <p class="about-text">Ces deux contenus ont été conçus pour explorer concrètement l'intégration de l'IA dans les dispositifs de Sales Enablement — au-delà du buzz, avec des <strong>données, des cas d'usage et des décisions terrain</strong>. Ils sont librement utilisables, partageables et déployables dans vos équipes.</p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      <span class="footer-name">Mélanie Dufau DCM · Sales Enablement Lab</span>
+      <span class="footer-copy">© 2026 · Ressources librement partageables</span>
+    </div>
+    <a class="footer-url" href="https://mdufau.github.io" target="_blank">mdufau.github.io</a>
+  </footer>
+
+</div>
+
+<script>
+const reveals = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+reveals.forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>
